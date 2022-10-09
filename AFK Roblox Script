@@ -1,0 +1,38 @@
+--[[
+	@author 1tzlxcid
+	@since 4/08/2021
+	This script will give the player AFK Overhead GUI When they Tab Out.
+--]]
+
+
+--[ LOCALS ]--
+
+local AFKStatus = {}
+local AFKEvent = game.ReplicatedStorage:FindFirstChild("AFK")
+
+--[ FUNCTIONS ]--
+
+if not AFKEvent then
+	AFKEvent = Instance.new("RemoteEvent")
+	AFKEvent.Parent = game.ReplicatedStorage
+	AFKEvent.Name = "AFK"
+end
+
+local updateAFK = function(player,enable)
+	
+	local GUI = player.Character:WaitForChild("HumanoidRootPart"):WaitForChild("OverheadGui")
+	local AFKTagT = GUI:WaitForChild("Username")
+	
+	if enable then
+		AFKTagT.Text = "AFK | "..player.Name.." (@"..player.DisplayName..")"
+	else
+		AFKTagT.Text = player.Name.." (@"..player.DisplayName..")"
+	end
+end
+
+
+AFKEvent.OnServerEvent:Connect(function(player,enable)
+	AFKStatus[player] = enable
+	updateAFK(player,enable)
+end)
+
