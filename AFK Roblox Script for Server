@@ -1,0 +1,89 @@
+--[[
+	@author 1tzlxcid
+	@helper Otuxe
+	@since 4/08/2021
+	This script will give the player AFK Overhead GUI When they Tab Out.
+--]]
+local replicatedStorage = game:GetService('ReplicatedStorage')
+local players = game:GetService('Players')
+
+local afkPlayers = {}
+local notAfkPlayers = {}
+
+local playerAfkEvent = replicatedStorage:FindFirstChild('Player Afk')
+local playerReturnEvent = replicatedStorage:FindFirstChild('Player Return')
+
+if not playerAfkEvent or not playerReturnEvent then
+	if not playerAfkEvent then
+		local newPlayerAfkEvent = Instance.new('RemoteEvent')
+		
+		newPlayerAfkEvent.Name = 'Player Afk'
+		newPlayerAfkEvent.Parent = replicatedStorage
+	end
+	if not playerReturnEvent then
+		local newPlayerReturnEvent = Instance.new('RemoteEvent')
+		
+		newPlayerReturnEvent.Name = 'Player Return'
+		newPlayerReturnEvent.Parent = replicatedStorage
+	end
+end
+
+playerAfkEvent = replicatedStorage:FindFirstChild('Player Afk')
+playerReturnEvent = replicatedStorage:FindFirstChild('Player Return')
+
+local function updateAfkStatus(player)
+	if not player.Character then
+		print 'the players character has not loaded in yet, returning function'
+		
+		return
+	end
+	
+	local humRootPart = player.Character:FindFirstChild('HumanoidRootPart')
+	local gui = humRootPart:FindFirstChild('OverheadGui')
+	
+	if humRootPart and gui then
+		local tag = gui:FindFirstChild('Username')
+		
+		local playerInAfkTable = table.find(afkPlayers, player.Name)
+		local playerInNotAfkTable = table.find(notAfkPlayers, player.Name)
+
+		if playerInAfkTable then
+			table.remove(afkPlayers[player.Name])
+
+			table.insert(notAfkPlayers[player.Name])
+			
+			if tag then
+				tag.Text = player.Name..' @'..player.DisplayName
+				
+				print 'default tag text'
+			elseif not tag then
+				warn 'could not find tag'
+				
+				return
+			end
+		elseif playerInNotAfkTable then
+			table.remove(notAfkPlayers[player.Name])
+
+			table.insert(afkPlayers[player.Name])
+
+			if tag then
+				tag.Text = 'AFK '..player.Name..' @'..player.DisplayName
+				
+				print 'afk tag text'
+			elseif not tag then 
+				warn 'could not find tag'
+				
+				return 
+			end
+		end
+	elseif not humRootPart or not gui then
+		warn 'couldnt find the humrootpart or gui, prob named something dif idk'
+	end
+end
+
+playerAfkEvent.OnServerEvent:Connect(function(player)
+	updateAfkStatus(player)
+end)
+playerReturnEvent.OnServerEvent:Connect(function(player)
+	updateAfkStatus(player)
+end)
