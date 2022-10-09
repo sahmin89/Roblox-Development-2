@@ -1,0 +1,101 @@
+--[[
+	@author 1tzlxcid
+	@since 5/14/2021
+	This script will save and put minutes on the leaderboard. You can change minutes to anything--
+	you would like just simply read the code and look at Minutes.Name = "Minutes" change "Minutes"
+	to anything like "Points", "Level", etc. Please watch my youtube tutorial if needed.
+	Place this script in ServerScriptService.
+--]]
+
+
+--[ SERVICES ]--
+
+local DataStoreService = game:GetService("DataStoreService")
+local DataStore = DataStoreService:GetDataStore("TimeStats")
+local service = game:GetService("MarketplaceService")
+
+
+--[ LOCALS ]--
+
+local VIPGamepassId = 13913938  -- VIP GAMEPASS ID
+local GamepassId = 13914120  -- GAMEPASS ID
+
+
+--[ FUNCTIONS ]--
+
+game.Players.PlayerAdded:Connect(function(Player)
+	
+
+	--[{ LEADERSTATS }]--
+
+    local Leaderstats = Instance.new("Folder")
+    Leaderstats.Name = "leaderstats"
+	Leaderstats.Parent = Player
+	
+	local Minutes = Instance.new("IntValue")
+	Minutes.Name = "Minutes" -- changing name here (points, levels, time, etc.)
+	Minutes.Value = 0 -- default value
+	Minutes.Parent = Player
+	
+	local Cash = Instance.new("IntValue")
+	Cash.Name = "Cash" -- changing name here (points, levels, time, etc.)
+	Cash.Value = 0 -- default value
+	Cash.Parent = Player
+	
+	
+	--[{ DATA STORE }]--
+	
+	
+	local Data = DataStore:GetAsync(Player.UserId) -- Get Data
+	
+	if type(Data) ~= "table" then
+		Data = nil
+	end
+	
+	if Data then
+		Minutes.Value = Data.Minutes
+		Cash.Value = Data.Cash
+	end
+	
+	local incrementValue = 1 -- value when adding points
+
+	if (service:UserOwnsGamePassAsync(Player.UserId, VIPGamepassId)) then -- 3x gamepass
+		incrementValue = 3
+	elseif (service:UserOwnsGamePassAsync(Player.UserId, GamepassId)) then -- 2x gamepass
+		incrementValue = 2
+	end
+	
+
+	--[{ TIME GIVERS }]--
+	
+	
+	coroutine.resume(coroutine.create(function() -- gives 1 point every minute
+		while true do
+			wait(60) -- every minute
+			Minutes.Value = Minutes.Value + incrementValue --  adds points based off of the incrementValue
+		end
+	end))
+	
+	coroutine.resume(coroutine.create(function() -- gives 1 point every minute
+		while true do
+			wait(120) -- every 2 minutes
+			Cash.Value = Cash.Value + incrementValue -- adds cash
+		end
+	end))
+	
+	
+end)
+
+
+
+
+game.Players.PlayerRemoving:Connect(function(Player) -- save function here
+	
+	--[{ DATA STORE SAVING }]--
+	
+	DataStore:SetAsync(Player.UserId, { -- gets data
+		Minutes = Player.Minutes.Value,
+		Cash = Player.Cash.Value
+	})
+	
+end)
