@@ -1,0 +1,279 @@
+--[[
+	@author 1tzlxcid
+	@credit Neutron_Flow for the help
+	@since 1/28/2021
+	This script will give anyone who owns gamepasses or is in groups, a special overhead tag
+	that is displayed over peoples heads. Please watch my tutorial on youtube on how to use.
+	Place this script in ServerScriptService.
+--]]
+
+
+--[ SERVICES ]--
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+--[ OVERHEAD LOCALS ]--
+
+local VIPOverheadGui = ReplicatedStorage:WaitForChild("VIPOverheadGui") -- GRABBING THE OVERHEAD GUI's
+local OverheadGui = ReplicatedStorage:WaitForChild("OverheadGui")
+local OwnerOverheadGui = ReplicatedStorage:WaitForChild("OwnerOverheadGui")
+local DonatorOverheadGui = ReplicatedStorage:WaitForChild("DonatorOverheadGui")
+
+--[ GAMEPASS/DONATOR LOCALS ]--
+
+local GamepassId = 13913938 -- VIP GAMEPASS ID GOES HERE
+local GroupId = 8428801 -- GROUP ID GOES HERE
+local Configuration = game.Workspace.Boards.R15Loader.Configuration -- Finding Configuration
+local DONATOR_ID = Configuration.userId -- Making Donator ID
+
+--[ MAIN FUNCTIONS ]--
+
+Players.PlayerAdded:Connect(function(Player)
+	Player.CharacterAdded:Connect(function(Character)
+		-- These variables are used regardless of whether the user owns the gamepass or not
+		-- so we can define them outside the if statement
+		local Humanoid = Character:WaitForChild("Humanoid")
+		local Head = Character:WaitForChild("HumanoidRootPart")
+		
+		-- Level for knowing when someone changes
+		local LEVEL = Player.Minutes
+		
+		-- Again, this happens regardless of the if statement
+		Humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		
+		-- Owner Name
+		if Player.Name == "1tzLxcid" then
+			
+			local CloneGuiOwner = OwnerOverheadGui:Clone()
+			local Gradient = CloneGuiOwner.Level.UIGradient
+			local GradientScript = CloneGuiOwner.Level.UIScript
+			
+			CloneGuiOwner.Username.Text = Player.Name.." (@"..Player.DisplayName..")"
+			CloneGuiOwner.Name = "OverheadGui"
+			CloneGuiOwner.Parent = Head
+			CloneGuiOwner.Rank.Text = "VIBE CREATOR"
+			
+			-- Level Rank Here
+			CloneGuiOwner.Level.Text = "LEVEL : "..LEVEL.Value
+			
+			-- Checking To See If Level Changed
+			LEVEL.Changed:Connect(function()
+				CloneGuiOwner.Level.Text = "LEVEL : "..LEVEL.Value
+				if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(1, 1, 1)
+					Gradient.Enabled = true
+					GradientScript.Disabled = false
+				elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+				elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+				elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+				elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+				elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+				else  -- DEFAULT LEVEL (WHITE)
+					CloneGuiOwner.Level.TextColor3 = Color3.new(255,255,255)
+				end
+			end)
+			
+			if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(1, 1, 1)
+				Gradient.Enabled = true
+				GradientScript.Disabled = false
+			elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+			elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+			elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+			elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+			elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+			else  -- DEFAULT LEVEL (WHITE)
+				CloneGuiOwner.Level.TextColor3 = Color3.new(255,255,255)
+			end
+			
+		-- TOP DONATOR
+		elseif Player.UserId == DONATOR_ID.Value then
+			
+			local DonatorCloneGui = DonatorOverheadGui:Clone()
+			local Gradient = DonatorCloneGui.Level.UIGradient
+			local GradientScript = DonatorCloneGui.Level.UIScript
+			
+			DonatorCloneGui.Username.Text = Player.Name.." (@"..Player.DisplayName..")"
+			DonatorCloneGui.Name = "OverheadGui"
+			DonatorCloneGui.Parent = Head
+			DonatorCloneGui.Rank.Text = "💸 TOP DONATOR 💸"
+			
+			-- Level Rank Here
+			DonatorCloneGui.Level.Text = "LEVEL : "..LEVEL.Value
+			
+			-- Checking To See If Level Changed
+			LEVEL.Changed:Connect(function()
+				DonatorCloneGui.Level.Text = "LEVEL : "..LEVEL.Value
+				if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(1, 1, 1)
+					Gradient.Enabled = true
+					GradientScript.Disabled = false
+				elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+				elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+				elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+				elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+				elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+				else  -- DEFAULT LEVEL (WHITE)
+					DonatorCloneGui.Level.TextColor3 = Color3.new(255,255,255)
+				end
+			end)
+			
+			if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(1, 1, 1)
+				Gradient.Enabled = true
+				GradientScript.Disabled = false
+			elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+			elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+			elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+			elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+			elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+			else  -- DEFAULT LEVEL (WHITE)
+				DonatorCloneGui.Level.TextColor3 = Color3.new(255,255,255)
+			end
+			
+		-- VIP / MORE RANKS
+		elseif MarketplaceService:UserOwnsGamePassAsync(Player.UserId, GamepassId) then
+			
+			local CloneGuiVIP = VIPOverheadGui:Clone()
+			local Gradient = CloneGuiVIP.Level.UIGradient
+			local GradientScript = CloneGuiVIP.Level.UIScript
+			
+			CloneGuiVIP.Username.Text = Player.Name.." (@"..Player.DisplayName..")"
+			CloneGuiVIP.Name = "OverheadGui"
+			CloneGuiVIP.Parent = Head
+			CloneGuiVIP.Username.TextColor3 = Color3.new(0.901961, 0.737255, 0)
+			
+			-- Group Role Here
+			local Role = "- Guest -"
+			pcall(function()
+				Role = Player:GetRoleInGroup(GroupId)
+			end)
+			CloneGuiVIP.Rank.Text = Role
+			
+			-- Level Rank Here
+			CloneGuiVIP.Level.Text = "LEVEL : "..LEVEL.Value
+			
+			-- Checking To See If Level Changed
+			LEVEL.Changed:Connect(function()
+				CloneGuiVIP.Level.Text = "LEVEL : "..LEVEL.Value
+				if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+					CloneGuiVIP.Level.TextColor3 = Color3.new(1, 1, 1)
+					Gradient.Enabled = true
+					GradientScript.Disabled = false
+				elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED )
+					CloneGuiVIP.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+				elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+					CloneGuiVIP.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+				elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+					CloneGuiVIP.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+				elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+					CloneGuiVIP.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+				elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+					CloneGuiVIP.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+				else  -- DEFAULT LEVEL (WHITE)
+					CloneGuiVIP.Level.TextColor3 = Color3.new(255,255,255)
+				end
+			end)
+			
+			if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+				CloneGuiVIP.Level.TextColor3 = Color3.new(1, 1, 1)
+				Gradient.Enabled = true
+				GradientScript.Disabled = false
+			elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED )
+				CloneGuiVIP.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+			elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+				CloneGuiVIP.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+			elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+				CloneGuiVIP.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+			elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+				CloneGuiVIP.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+			elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+				CloneGuiVIP.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+			else  -- DEFAULT LEVEL (WHITE)
+				CloneGuiVIP.Level.TextColor3 = Color3.new(255,255,255)
+			end
+			
+		else 
+			-- Different / Default Overhead
+			local CloneGui = OverheadGui:Clone()
+			local Gradient = CloneGui.Level.UIGradient
+			local GradientScript = CloneGui.Level.UIScript
+			
+			CloneGui.Username.Text = Player.Name.." (@"..Player.DisplayName..")"
+			CloneGui.Name = "OverheadGui"
+			CloneGui.Parent = Head
+			
+			-- Group Role Here
+			local Role = "- Guest -"
+			pcall(function()
+				Role = Player:GetRoleInGroup(GroupId)
+			end)
+			CloneGui.Rank.Text = Role
+			
+			-- Level Rank Here
+			CloneGui.Level.Text = "LEVEL : "..LEVEL.Value
+			
+			-- Checking To See If Level Changed
+			LEVEL.Changed:Connect(function()
+				CloneGui.Level.Text = "LEVEL : "..LEVEL.Value
+				if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+					CloneGui.Level.TextColor3 = Color3.new(1, 1, 1)
+					Gradient.Enabled = true
+					GradientScript.Disabled = false
+				elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED)
+					CloneGui.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+				elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+					CloneGui.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+				elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+					CloneGui.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+				elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+					CloneGui.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+				elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+					CloneGui.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+				else  -- DEFAULT LEVEL (WHITE)
+					CloneGui.Level.TextColor3 = Color3.new(255,255,255)
+				end
+			end)
+			
+			if LEVEL.Value >= 100000 then -- Over 100000 Minute LEVEL (RAINBOW)
+				CloneGui.Level.TextColor3 = Color3.new(1, 1, 1)
+				Gradient.Enabled = true
+				GradientScript.Disabled = false
+			elseif LEVEL.Value >= 10000 then -- Over 10000 Minute LEVEL (DARK RED)
+				CloneGui.Level.TextColor3 = Color3.new(0.658824, 0, 0)
+			elseif LEVEL.Value >= 5000 then -- Over 5000 Minute LEVEL (ORANGE)
+				CloneGui.Level.TextColor3 = Color3.new(1, 0.666667, 0)
+			elseif LEVEL.Value >= 1000 then -- Over 1000 Minute LEVEL (BLUE)
+				CloneGui.Level.TextColor3 = Color3.new(0, 0.666667, 1)
+			elseif LEVEL.Value >= 500 then -- Over 500 Minute LEVEL (PURPLE)
+				CloneGui.Level.TextColor3 = Color3.new(0.85098, 0.00784314, 1)
+			elseif LEVEL.Value >= 100 then -- Over 100 Minute LEVEL (GREEN)
+				CloneGui.Level.TextColor3 = Color3.new(0.333333, 1, 0)
+			else  -- DEFAULT LEVEL (WHITE)
+				CloneGui.Level.TextColor3 = Color3.new(255,255,255)
+			end
+		end
+	end)
+end)
